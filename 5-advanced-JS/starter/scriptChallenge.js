@@ -1,13 +1,17 @@
-var questionNr, userInput;
+var questionNr, isPlaying, score;
 
 questionNr = 1;
+isPlaying = true;
+score = 0;
 
 // f-ion constructor
 var Question = function(qText, answer, correctAnswer) {
+    var userInput;
     this.qText = qText;
     this.answer = answer;
     this.correctAnswer = correctAnswer;
     this.randLog = function() {
+        console.log('##########################');
         console.log('Question nr.' + questionNr); 
         console.log(this.qText);
         console.log('');
@@ -16,19 +20,26 @@ var Question = function(qText, answer, correctAnswer) {
             console.log((i+1) + '.' + this.answer[i] + ' ');
             
         }
-        console.log('');
+        //console.log('');
         questionNr++;
         
         userInput = prompt('Please choose the corect answer (type in the number)');
+        if(userInput === 'exit'){
+            isPlaying = false;
+        }
     }
     
-    this.checkAnswer = function() {
-        
+    /*
+    // IIFE
+        // ans --> this.answer,
+        // cAns --> this.correctAnswer,
+        // uInp --> userInput
+        (function(ans, cAns, uInp,) {
         //index of #ore#t ans. 
-        var indexOfAns = this.answer.indexOf(this.correctAnswer);
+        var indexOfAns = ans.indexOf(cAns);
         
-        if (userInput != '' && userInput > 0 && userInput <= this.answer.length) {
-            if((userInput - 1) === indexOfAns) {
+        if (uInp != '' && uInp > 0 && uInp <= ans.length) {
+            if((uInp - 1) === indexOfAns) {
                 console.log('CONGRATULATIONS! The answer is correct.');
             } else {
                 console.log('That is not right. Try again.');
@@ -37,7 +48,50 @@ var Question = function(qText, answer, correctAnswer) {
 } else {
     console.log('ERROR!');
 }
+    })(this.answer, this.correctAnswer, userInput);
+    
+    */
+    
+    
+    
+    
+    // SIMPLE F-ION
+    // checking corectness
+    this.checkAnswer = function() {
+        console.log('__________________________');
+        
+        //index of #ore#t ans. 
+        var indexOfAns = this.answer.indexOf(this.correctAnswer);
+        
+        if (userInput != '' && userInput > 0 && userInput <= this.answer.length) {
+            if((userInput - 1) === indexOfAns) {
+                console.log('CONGRATULATIONS! The answer is correct.');
+                score++;
+                
+            } else {
+                console.log('That is not right. Try again.');
+                
+            }
+    
+} else if (userInput === 'exit') {
+    console.log('Bye bye!');
+} else {
+    console.log('ERROR!');
+}
     }
+    
+    
+    this.displayScore = function() {
+        console.log('Your score: ' + score + '/' + (questionNr-1));
+        console.log('__________________________');
+    }
+    
+    
+    
+    
+    
+    
+    
 }
 
 var question1 = new Question('What is the capital city of Costa Rica?', ['Lima', 'Santiago', 'Montevideo', 'San José'], 'San José');
@@ -52,11 +106,22 @@ var question4 = new Question('What is the capital city of Peru?', ['Lima', 'Sant
 var allQuestions = [question1, question2, question3, question4];
 
 
+
+while(isPlaying){
+    
+// random nr. for given number of questionsmin 'allQuestions'
 var randNr = Math.floor(Math.random() * allQuestions.length);
 
+// Calling simple f-ion
 var randomQuestObj = allQuestions[randNr];
 randomQuestObj.randLog();
 randomQuestObj.checkAnswer();
+randomQuestObj.displayScore();
+}
+
+
+
+// Calling IIFE
 
 
 
