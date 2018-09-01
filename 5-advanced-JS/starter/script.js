@@ -38,6 +38,7 @@ var Person = function(name, yearOfBirth, job) {
 
 //PROTOTYPE
 // The method '#al#ulateAge' is not in the #onstru#tor but we #an still use this method. IT IS BE#AUSE IT IS IN THE PROTOTYPE PROPERTY of our f-ion #onstru#tor (!!!!!!!!!). That is inheritan#e in pra#tise.
+
 Person.prototype.calculateAge = function() {
         console.log(2016 - this.yearOfBirth);
     }
