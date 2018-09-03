@@ -551,6 +551,7 @@ interviewQuestion('designer') ('Petras');
 // Bind, Call and Apply (methods)
 ///////////////////////////////////////
 
+/*
 
 
 // Re#ap: F-ions are some spe#ial #ind of obje#ts.
@@ -722,6 +723,300 @@ var fullJapan = arrayCalc(ages, isFullAge.bind(this, 20)); // in this #ase we do
 
 console.log(ages);
 console.log(fullJapan);
+
+*/
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////
+// CODING CHALLENGE
+// Solution
+////////////////////////////////
+
+
+// IIFE
+// we place all the code inside of
+//  (function() {
+//          }) ();
+// 
+// If someone will include this code in its project, and will also have variables with the same names, THEN this will NOT interfere with our code. I.e. our code is safe, no other code is going to overwrite it. THAT IS THE MAIN GOAL OF USING IIFE
+
+/*
+
+(function() {
+    
+    
+function Question(question, answers, correct) {
+    this.question = question;
+    this.answers = answers;
+    this.correct = correct;
+    
+    // we should not write the method for displaying questions in the object(#onstru#tor?), be#ause all those 3 questions will have this method atta#hed to them... That is not good(why?).
+}
+
+
+//Need to write a method into the question's PROTOTYPE PROPERTY, whi#h is the PROTOTYPE of all of the instan#es (i.e. all of the obje#ts) #reated thru it:
+Question.prototype.displayQuestion =
+    function() {
+    console.log(this.question);
+    
+    for (var i = 0; i < this.answers.length; i++) {
+        console.log(i + ': ' + this.answers[i]);
+    }
+}
+//e.g. when this method will be #alled on q1, then 'this'  var. will be pointing to q1 AND question aso#iated to q1 will be retrieved!!!!!!!!!!!!!!!!
+
+
+
+Question.prototype.checkAnswer = 
+    // we will #ompare user answer with our correct answer, therefore we need to pass in this answer ('ans') into method
+    function(ans) {
+        if (ans === this.correct) {
+            console.log('Correct answer!');
+        } else {
+            console.log('Wrong answer!');
+        }
+    
+}
+
+
+var q1 = new Question('Is JavaScript the coolest programming language in the world?',
+                     ['Yes', 'No'],
+                     0);
+// q1 will hold a REFEREN#E to the pla#e in memory where this obje#t is lo#ated
+
+
+var q2 = new Question('What is the name of this course\'s teacher?',
+                     ['John',
+                     'Michael',
+                     'Jonas'],
+                     2);
+
+var q3 = new Question('What does the best describes coding?',
+                     ['Boring',
+                     'Hard', 'Fun',
+                     'Tedious'],
+                     2);
+
+
+
+var questions = [q1, q2, q3];
+
+
+var n = Math.floor(Math.random() * questions.length);
+
+// display question
+questions[n].displayQuestion();
+
+// parseInt() #onverts string to an integer
+var answer = parseInt(prompt('Please select the correct answer.'));
+
+// checks answer
+questions[n].checkAnswer(answer);
+
+    
+})(); // ...(); <-- calling IIFE
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////
+//SOLUTION TO EXPERT LEVEL PART
+///////////////////////////
+
+(function() {
+    
+    
+function Question(question, answers, correct) {
+    this.question = question;
+    this.answers = answers;
+    this.correct = correct;
+    
+    // we should not write the method for displaying questions in the object(#onstru#tor?), be#ause all those 3 questions will have this method atta#hed to them... That is not good(why?).
+}
+
+
+//Need to write a method into the question's PROTOTYPE PROPERTY, whi#h is the PROTOTYPE of all of the instan#es (i.e. all of the obje#ts) #reated thru it:
+Question.prototype.displayQuestion =
+    function() {
+    console.log(this.question);
+    
+    for (var i = 0; i < this.answers.length; i++) {
+        console.log(i + ': ' + this.answers[i]);
+    }
+}
+//e.g. when this method will be #alled on q1, then 'this'  var. will be pointing to q1 AND question aso#iated to q1 will be retrieved!!!!!!!!!!!!!!!!
+
+
+
+Question.prototype.checkAnswer = 
+    // we will #ompare user answer with our correct answer, therefore we need to pass in this answer ('ans') into method
+    function(ans, callback) {
+        var sc;
+    
+        if (ans === this.correct) {
+            console.log('Correct answer!');
+            sc = callback(true); // that is a passed f-ion. Sin#e it returns something, we need to store the s#ore somewhere
+            
+        } else {
+            console.log('Wrong answer!');
+            
+            sc = callback(false); // will just return #urrent s#ore
+        }
+    
+    this.displayScore(sc); //we have a##ess to this method be#ause of PROTOTYPE #AIN(???????????).
+    // BE#AUSE 'this' VARIABLE WILL POINT TO THE OBJE#T, ON WHI#H THIS (checkAnswer) METHOD WAS #ALLED AND ASWEL IT ('this') WILL HAVE AN A##ESS TO displayQuestion METHOD AS WELL.
+}
+
+
+// Method that is going to display the s#ore in the #onsole:
+Question.prototype.displayScore =
+    function(score) {
+    console.log('Your current score is: ' + score);
+    console.log('_________________________________________________');
+    
+}
+
+
+
+var q1 = new Question('Is JavaScript the coolest programming language in the world?',
+                     ['Yes', 'No'],
+                     0);
+// q1 will hold a REFEREN#E to the pla#e in memory where this obje#t is lo#ated
+
+
+var q2 = new Question('What is the name of this course\'s teacher?',
+                     ['John',
+                     'Michael',
+                     'Jonas'],
+                     2);
+
+var q3 = new Question('What does the best describes coding?',
+                     ['Boring',
+                     'Hard', 'Fun',
+                     'Tedious'],
+                     2);
+
+var questions = [q1, q2, q3];
+    
+//////////////////////////////////////////////////
+// will use CLOSURE to track the score of the game.
+
+//will write a f-ion which is going to keep the score and 
+// to update it when the user's answer is correct.
+    
+// It is going to be like a CONTAINER where we can ceep
+// everything what is related to the score i.e. the score 
+// itself and the f-ion to update.
+    
+// INSTEAD of having Global Variables and variable 
+// mutations over the code.
+    
+
+ function score() {
+     var sc = 0;
+     
+     //this f. is going to return another f., and that f. will increase the s#ore if the answer is correct, AND then RETURN it.
+     
+     return function(correct) {
+         if (correct) {
+             sc++;
+         }
+         return sc; //?????   
+     }  
+ }
+    
+ // need to call this f. and store it, be#ause it returns another f-ion, SO we will #eep that f. in that var.
+
+var keepScore = score();
+    // explanation: 
+    // Remember what 'closures' are? -  we #all 's#ore' f-ion, it defines the var. 'sc', and then we return inner f-ion. AND this f. will be attached to variable 'keepScore'. THANKS TO CLOSURES WE CEEP THE ACCESS TO THE VARIABLES, THAT THE OUTER F-ION DEFINES. THAT MEANS THAT 'sc' VARIABLE WILL ALWAYS BE ACCESSIBLE BY 'keepScore' F-ION. 
+    
+    // (MM):
+    //MEANING OF DOING THAT IS THAT NOBODY CAN ACCESS 'sc' AND MUTATE IT. AS IT WOULD BE IF WE WOULD KEEP 'sc' GLOBAL VAR.(????)
+    
+    
+    
+
+function nextQuestion() {
+    
+    var n = Math.floor(Math.random() * questions.length);
+
+    // display question
+    questions[n].displayQuestion();
+
+    
+    var answer = prompt('Please select the correct answer.');
+ 
+    
+    // calls itself if only the user input is not 'exit'
+    //'answer' is a string at this point, so we #omparing two strings
+    if(answer !== 'exit') {
+        
+        // parseInt() #onverts string to an integer
+         // 'checkAnswer' needs an int so we use 'parseInt'
+        questions[n].checkAnswer(parseInt(answer), keepScore); // 'keepS#ore is the var. that #ontains the f-ion, and the CLOSURE which keeps track of the score'. 
+        // We are passing f-ion in here
+        
+        nextQuestion(); // calls itself
+    }
+}
+    
+    
+nextQuestion();
+
+
+    
+})(); // ...(); <-- calling IIFE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
