@@ -203,7 +203,11 @@ var UIcontroller = (function () {
         inputValue: '.add__value',
         inputBtn: '.add__btn',
         incomeContainer: '.income__list', // this element is sele#ted if we have 'income'
-        expensesContainer: '.expenses__list' // ... 'expenses'
+        expensesContainer: '.expenses__list', // ... 'expenses'
+        budgetLabel: '.budget__value',
+        incomeLabel: '.budget__income--value',
+        expenseLabel: '.budget__expenses--value',
+        percentageLabel: '.budget__expenses--percentage'
     }; // If we will de#ide all the #lass names in UI, then it is not a big problem!!!
 
 
@@ -305,6 +309,23 @@ var UIcontroller = (function () {
             // sets the FOCUS to the first element of the array
             //fieldsArr[0].focus;
         },
+        
+        displayBudget: function(obj) {
+            // #anging text #ontent
+            document.querySelector(DOMstrings.budgetLabel).textContent = obj.budget; // it is equal to the budget, and that budget #omes from an obje#t that we pass to this method.
+            document.querySelector(DOMstrings.incomeLabel).textContent = obj.totalInc;
+            document.querySelector(DOMstrings.expenseLabel).textContent = obj.totalExp;
+            
+            
+            if(obj.percentage > 0) {
+                document.querySelector(DOMstrings.percentageLabel).textContent = obj.percentage + '%'; 
+            } else {
+                document.querySelector(DOMstrings.percentageLabel).textContent = '---';
+                
+            }
+            
+            
+        },
 
 
 
@@ -386,7 +407,7 @@ var controller = (function (budgetContr, UIcontr) {
         var budget = budgetContr.getBudget();
 
         // 3. Display the budget on UI 
-        console.log(budget);
+        UIcontr.displayBudget(budget);
 
 
         // NOTE: ea#h f-ion has a spe#ifi# task, SO we will have one f. to  #al#ulate the budget and separate f. to return the budget. Simply getting some information from a module IS A GOOD TASK for simple f-ion.
@@ -434,6 +455,14 @@ var controller = (function (budgetContr, UIcontr) {
             console.log('Appli#ation has started.');
             // here need to #all settupEventListenners f-ion (that is the 
             // purpose of 'init' f.)
+            
+            //to set everything to 0:
+            UIcontr.displayBudget({ 
+                budget: 0,
+                totalInc: 0,
+                totalExp: 0,
+                percentage: -1
+            });
 
             // our event listenners are going to be set up after #alling 
             // init f-ion. It need to be done outside of #ontrollers.
