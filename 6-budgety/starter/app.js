@@ -21,10 +21,32 @@ var budgetController = (function () {
         this.id = id; // 'this.id' is equal the 'id' that we passing in...
         this.description = description;
         this.value = value;
+        this.percentage = -1; // when percentage is not defined it will be equal to -1
+
     }; // IN #ASE THAT WE NEED SOME METHODS FOR THEM(??), WE #AN PUT THESE METHODS IN THE PROTOTYPE PROPERTY OF 'Expense' or 'In#ome', SO that all obje'ts #reted through these f-ion #onstru#tors, will INHERIT these methods.
 
     //INSTEAD of writing these methods right into #onstru#tors, we #an put them into the PROTOTYPES.
     // It is BETTER BE#AUSE IN THIS WAY, METHODS ARE NOT ATTA#HED TO INDIVIDUAL OBJE#T, BUT INSTEAD EA#H OBJ. WILL THEN INHERIT IT (method) FROM THE PROTOTYPE. 
+
+
+    // Not just adding method in f-ion #onstru#tor, but INSTEAD WILL ADD IT TO its PROTOTYPE. 
+    // SO, all the objects that are created through this ''Expense'' prototype will inherit this method be#ause of prototype chain (This method will be in PROTOTYPE property of 'Expense'):
+
+    // will #all this method 'calcPercentage'
+    Expense.prototype.calcPercentage = function (totalIncome) {
+        if (totalIncome > 0) {
+            this.percentage = Math.round((this.value / totalIncome) * 100); // will get 'int' value
+        } else {
+            this.percentage = -1;
+        }
+    };
+
+    // 'getPercentage' method for 'Expense' object (of f-ion constructor):
+    Expense.prototype.getPercentage = function () {
+        return this.percentage;
+    };
+
+
 
 
     var Income = function (id, description, value) {
@@ -40,14 +62,14 @@ var budgetController = (function () {
         // forEa#h method a##epts #allba#k f-ion, AND that f. has an a##ess to 3 parameters: -#urrent val, -#urrent index, -#omplete array. IN THIS #ASE WE ONLY NEED A #URRENT ELEMENT
         data.allItems[type].forEach(function (cur) {
             //'cur' - be#ause we #an #all it whatever we want
-            
+
             sum += cur.value; // 'cur' refers to either 'Income' or 'Expense' obje#t, THAT IS STORRED AT THE CURRENT POSSITION OF 'exp' or 'inc' arrays.
-            
+
             // this F-ion will be applyed to ea#h obje#t of #ossen array
         });
-        
+
         //we could return this 'sum', BUT it is better(why??) to store it in global 'data' stru#ture in 'totals' obj.
-        data.totals[type] = sum;    
+        data.totals[type] = sum;
     };
 
 
@@ -124,6 +146,28 @@ var budgetController = (function () {
 
         },
 
+        // It is going to be called by the 'budgetController'
+        deleteItem: function (type, id) {
+            var ids, index;
+
+            // we gonn loop through all the elements in the 'inc' or 'exp' arrays:
+            // map() re#eives a callback f-ion, which has access to the current element, current index, and entire array
+            ids = data.allItems[type].map(function (current) {
+
+                // map() returns a brand new array, of the same length as allItems[type], but all members will be IDs of 'current' elements:
+                return current.id;
+            });
+
+            // finds index of id (that we have passed to the method) in 'ids' array:
+            index = ids.indexOf(id); // index can be '-1' if index is not found in the array in which we are searching
+
+            // we need to delete this item from the array:
+            if (index !== -1) {
+                //'splice' method is used to remove elements from array:
+                data.allItems[type].splice(index, 1); // FIRST argument is position nr., at which we want to start deleting. SECOND argument is the nr. of element that we want to delete.
+            }
+        },
+
 
         calculateBudget: function () {
 
@@ -134,31 +178,76 @@ var budgetController = (function () {
 
             //*** #al#ulate the budget: in#ome - expenses
             data.budget = data.totals.inc - data.totals.exp;
-            
-            if(data.totals.inc > 0) {
-                
-            //*** #al#ulate per#entage of in#ome that we spent
-            data.percentage = Math.round ((data.totals.exp / data.totals.inc) * 100);
-            
-            //eg. Expense=100 and In#ome=200, spent 50%=100/200 * 100
-            
-            //'Math.round()' rounds to the #losest integer
+
+            if (data.totals.inc > 0) {
+
+                //*** #al#ulate per#entage of in#ome that we spent
+                data.percentage = Math.round((data.totals.exp / data.totals.inc) * 100);
+
+                //eg. Expense=100 and In#ome=200, spent 50%=100/200 * 100
+
+                //'Math.round()' rounds to the #losest integer
             } else {
                 data.percentage = -1; //indi#ates that per#entages doesn't exist
             }
 
         },
-        
+
+
+        calculatePercentages: function () {
+            // need to calculate the Expense percentage for each of the expence object that are stored in the 'exp' array.
+
+            // e.g.
+
+            // Expenses:
+            // a=20
+            // b=10
+            // c=40
+            // Total income:
+            // income=100
+            // What is the per#entage of a?
+            // a% = 20/100=20%
+            //............
+
+            // We need a method for each of these Expense objects (that are stored in data structure) that calculates this percentage
+
+            // callback f-ion specifies what we want to happen for each of the elements. 'cur' - current element.
+            data.allItems.exp.forEach(function (cur) {
+
+                //for ea#h of the elements need to #all 'calcPercentage' method:
+                cur.calcPercentage(data.totals.inc);
+            });
+        },
+
+
+        getPercentages: function () {
+            // need to loop through the all expenses
+            // we also want to store the returned values. Will use map()
+            // method for that
+
+            // 'allPerc' - array with all the percentages
+            var allPerc = data.allItems.exp.map(function (cur) {
+                return cur.getPercentage();
+            });
+            // map() returns and stores something in variable while forEach() doesn't store.
+            return allPerc;
+
+
+            // eg.
+            // If we have 5 obj. in 'exp' array. Then ''return cur.getPercentage()'' will be called 5 times, and each time percentage will be stored in 'allPerc' array. AND in the end this array will be returned.
+        },
+
+
         // creating method ONLY for returning something from data stru#ture or module. THAT IS HOW IT SHOULD BE DONE. There should be f-ions that only retrieve data or only set data.
-        getBudget: function() {
+        getBudget: function () {
             return { // sin#e we returning few things at on#e, need to use an OBJECT
-                
+
                 //!!!! in here we #reate 4 properties for 4 values
                 budget: data.budget,
                 totalInc: data.totals.inc,
                 totalExp: data.totals.exp,
                 percentage: data.percentage
-            };   
+            };
         },
 
 
@@ -207,8 +296,11 @@ var UIcontroller = (function () {
         budgetLabel: '.budget__value',
         incomeLabel: '.budget__income--value',
         expenseLabel: '.budget__expenses--value',
-        percentageLabel: '.budget__expenses--percentage'
-    }; // If we will de#ide all the #lass names in UI, then it is not a big problem!!!
+        percentageLabel: '.budget__expenses--percentage',
+        container: '.container', // class in HTML, that is a parent of in#ome and expense elements
+        expensesPercLabel: '.item__percentage'
+
+    }; // If we will de#ide all the #lass names in UI, then it is not a big problem!!!(???)
 
 
     //f-ion to get an user input
@@ -247,11 +339,11 @@ var UIcontroller = (function () {
             if (type === 'inc') {
                 element = DOMstrings.incomeContainer;
 
-                html = '<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+                html = '<div class="item clearfix" id="inc-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             } else if (type === 'exp') {
                 element = DOMstrings.expensesContainer;
 
-                html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+                html = '<div class="item clearfix" id="exp-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             }
 
 
@@ -271,6 +363,24 @@ var UIcontroller = (function () {
             // 'insertAdjacentHTML(), with 'beforeend' keyword makes that 'newHtml' string will be inserted as a child of containers 'income__list' or 'expenses__list', BUT AS THE LAST CHILD (I.E. as the last element in the list).
 
         },
+
+        // will delete an element from  UI (remove it from DOM)
+        deleteListItem: function (selectorID) {
+            // To remove something from DOM we have 'removeChild' method.
+            // Therefore we need to know the parent. We need to move up in 
+            // the DOM, so that we can then remove the child.
+            // !!!! WE CAN'T DELETE THE ELEMENT, WE CAN JUST DELETE ITS CHILD.
+
+            // selecting element by ID, then
+            // ..moving up to the parent, then
+            // ..removing child with 'removeChild()', THEN
+            // .. need again to select it therefore passing 'document.getElementById(selectorID)' to 'removeChild()':
+
+            // selecting an item and saving it into variable:
+            var el = document.getElementById(selectorID);
+            el.parentNode.removeChild(el);
+        },
+
 
         clearFields: function () {
             var fields, fieldsArr;
@@ -309,22 +419,68 @@ var UIcontroller = (function () {
             // sets the FOCUS to the first element of the array
             //fieldsArr[0].focus;
         },
-        
-        displayBudget: function(obj) {
+
+        displayBudget: function (obj) {
             // #anging text #ontent
             document.querySelector(DOMstrings.budgetLabel).textContent = obj.budget; // it is equal to the budget, and that budget #omes from an obje#t that we pass to this method.
             document.querySelector(DOMstrings.incomeLabel).textContent = obj.totalInc;
             document.querySelector(DOMstrings.expenseLabel).textContent = obj.totalExp;
-            
-            
-            if(obj.percentage > 0) {
-                document.querySelector(DOMstrings.percentageLabel).textContent = obj.percentage + '%'; 
+
+
+            if (obj.percentage > 0) {
+                document.querySelector(DOMstrings.percentageLabel).textContent = obj.percentage + '%';
             } else {
                 document.querySelector(DOMstrings.percentageLabel).textContent = '---';
-                
+
             }
-            
-            
+
+
+        },
+
+        // method is going to receive the percentage array that we have stored in app controller
+        displayPercentages: function (percentages) {
+
+            //need to select all the elements that has "item__percentage" class. 
+            //Can't use 'querySelector' because it selects the first one. Instead will use ''querySelectorAll''.
+
+            var fields = document.querySelectorAll(DOMstrings.expensesPercLabel); // this returns a 'node list', because in the DOM tree where all the HTML elements of page are stored, each element is called a ''NODE''.
+            // Need to loop through all the elements (all these NODES), and then change the text content property for all of them.
+
+
+
+            // 'Node list' doesn't have forEach method. We will need again convert 'node list' into an array by using previous techniek, but this time we will create our own 'forEach' f-ion BUT for 'note lists'.
+            // 'list' - node list
+            // 'callback' - callback f-ion
+            ///////////////////////////////////////////
+            // IT MAY BE REUSED FOR ANY 'NODE LISTS'
+            ///////////////////////////////////////////
+            var nodeListForEach = function (list, callback) {
+                // each iteration will call callback f-ion
+                for (var i = 0; i < list.length; i++) {
+                    callback(list[i], i); // using the power of FIRST CLASS F-IONS. F-ions can be passed like this...(??)
+                } // NOTE: 'node list' has 'length' property
+
+            };
+
+
+            //!!!!!!!!!!!!!!!!!
+            // EXPLANATION:     When we call 'nodeListForEach' f-ion, we pass a callback f-ion into it. This f-ion is assigned to 'callback' parameter. We will loop over 'list' AND in each iteration the 'callback' f-ion gets called WITH THE ARGUMENTS THAT WE SPECIFY DOWN THERE (where we all 'nodeListForEach').
+            // SO the code that we got in ANONYMOUS F-ION will be executed as many times as there will be iterations. We will have access to the 'current' element and current 'index' because we have passed them into the callback f-ion in there: 'callback(list[i], i)'.
+
+            nodeListForEach(fields, function (current, index) { // 'current' is a list element at possition 'index'
+
+                if (percentages[index] > 0) {
+
+                    //need to display percentages to the webpage
+                    current.textContent = percentages[index] + '%';
+                    // using 'textContent' property of 'current' element
+                    // At first element we want first per#entages, at se#ond - se#ond and et#.
+
+                } else {
+                    current.textContent = '---';
+                }
+            });
+
         },
 
 
@@ -395,9 +551,19 @@ var controller = (function (budgetContr, UIcontr) {
 
         });
 
+
+        /////////////////////////////////////
+        // We will set up an event on a parent element of the elements that 
+        // we are interested in.
+        //////////////////////////////////////
+        document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem); // adding event listenner to the parrent of our elements that will need to handle some events. 'ctrlDeleteItem' - f-ion, that is going to be called when someone clicks on 'container'.
+
+
+
+
     };
 
-            // it is #alled ea#h time we add a new item to UI
+    // it is #alled ea#h time we add a new item to UI
     var updateBudget = function () {
 
         // 1. #al#ulate the budget (for it will #reate a publi#k method in budgetController)
@@ -412,6 +578,21 @@ var controller = (function (budgetContr, UIcontr) {
 
         // NOTE: ea#h f-ion has a spe#ifi# task, SO we will have one f. to  #al#ulate the budget and separate f. to return the budget. Simply getting some information from a module IS A GOOD TASK for simple f-ion.
 
+    };
+
+
+    // It will be used by ctrlAddItem() and ctrlDeleteItem():
+    var updatePercentages = function () {
+
+        // 1. Calculate the percentages
+        budgetContr.calculatePercentages();
+
+
+        // 2. Read percentages from 'budgetController'
+        var percentages = budgetContr.getPercentages();
+
+        // 3. Update the UI with the new percentages
+        UIcontr.displayPercentages(percentages);
     };
 
 
@@ -440,8 +621,69 @@ var controller = (function (budgetContr, UIcontr) {
             //## 5. Calculate and update budget
             updateBudget();
 
+            //## 6. Calculate and update percentages
+            updatePercentages();
         }
+    };
 
+
+
+
+    var ctrlDeleteItem = function (event) {
+        var itemID, splitID, type, ID;
+        //We can say that we want access to the 'event obj.' by puting
+        //parameter 'event' in here ('event' is an arbitrary chosen name)
+        // Reason why we need this event here is that we want to know WHAT THE 
+        //TARGET ELEMENT IS!!!
+        // In 'event delegation' an event bubbles up and then we can know 
+        //where it came from (where it was first fired) by looking to TARGET 
+        //property of the event.
+
+        //When we #li#k on 'delete' button, we a#tually #li#k on 'i' element
+        //When we #li#k the button, it is not only the button that we want to delete. We want to delete all of the html #ode, that is representing our added element (whether it is expense or in#ome).
+        // Ea#h of those items are identified by unique ID name e.g. 'income-0'. 
+        //RESUME: i element (target element) that we #li#k, is not the one that we are interested in, it is its parant element e.g. <div class="item clearfix" id="income-0">. We want to have a##ess to it.
+        //SO WE WANT TO MOVE UP IN DOM. IT IS CALLED ''DOM TRAVERSING''.
+
+
+        // READING THIS ID FROM DOM
+        itemID = event.target.parentNode.parentNode.parentNode.parentNode.id; // We want a parent node of this 'target'. This 'target' property returns html NODE IN THE DOM. When we want to move up from that can add '.parentNode'
+        // now we are a##essing the button element NOT the 'i' element. Button element is the parent of 'i'. 
+        // If we want to move to "<div class="item clearfix" id="income-0">", we need to use 'parentNode' property 4 times!!!!
+        ///SO NOW WE REA#HED DIV ELEMENT, THAT WE ARE INTERESTED IN. PARTI#ULARLY WE ARE INTERESTED IN ID #OZ IT IS UNIQUE IDENTIFIRE OF THIS ITEM.
+
+
+        // other elements of the page don't have an ids.
+        if (itemID) { // itemId will be COERCED (IE. CONVERTED) to true if it EXIST, othervise it will be coerced to false.
+
+
+            // Initially the string is primitive.
+            // As soon as we call one of methods on a string, then JS 
+            // automati#ally puts a wrapper around THE STRING AND CONVERTS 
+            // IT FROM PRIMITIVE TO AN OBJECT. Then this OBJECT has a##ess 
+            // to lots of string methods.
+            // The same happens to NUMBERS!!!
+
+            // using split method on string:
+            splitID = itemID.split('-'); // 'split() returns array with a
+            // members of a broken string parts'
+            type = splitID[0]; //...
+            ID = parseInt(splitID[1]); // 'split' method returns string, SO we need parseInt to convert it to 'int'
+
+            // now we can delete the item from UI and the data model (budgetController).
+
+            //## 1. delete the item from the data structure
+            budgetContr.deleteItem(type, ID);
+
+            //## 2. Delete the item from the UI
+            UIcontr.deleteListItem(itemID);
+
+            //## 3. Update and show the new budget
+            updateBudget();
+
+            //## 4. Calculate and update percentages
+            updatePercentages();
+        }
     };
 
 
@@ -455,9 +697,9 @@ var controller = (function (budgetContr, UIcontr) {
             console.log('Appli#ation has started.');
             // here need to #all settupEventListenners f-ion (that is the 
             // purpose of 'init' f.)
-            
+
             //to set everything to 0:
-            UIcontr.displayBudget({ 
+            UIcontr.displayBudget({
                 budget: 0,
                 totalInc: 0,
                 totalExp: 0,
@@ -467,7 +709,6 @@ var controller = (function (budgetContr, UIcontr) {
             // our event listenners are going to be set up after #alling 
             // init f-ion. It need to be done outside of #ontrollers.
             setupEventListeners();
-
         }
     };
 
