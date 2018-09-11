@@ -298,9 +298,72 @@ var UIcontroller = (function () {
         expenseLabel: '.budget__expenses--value',
         percentageLabel: '.budget__expenses--percentage',
         container: '.container', // class in HTML, that is a parent of in#ome and expense elements
-        expensesPercLabel: '.item__percentage'
+        expensesPercLabel: '.item__percentage',
+        dateLabel: '.budget__title--month'
 
     }; // If we will de#ide all the #lass names in UI, then it is not a big problem!!!(???)
+
+
+
+    // Method description: Each time that we display nr. in UI we call 
+    // this method and inputing nr. into this method AND outputing 
+    // FORMATED NUMBER.
+    var formatNumber = function (num, type) {
+        var numSplit, int, dec, type, sign;
+
+        //# +or- before the number
+        //# exactly 2 decimal points
+        //# coma separating the tousands
+
+        // eg.: 2310.4567 -> + 2,310.46
+        //      2000 -> + 2,000.00
+
+        // getting absolute number
+        num = Math.abs(num); // 'num' is treated as a 'regular variable'. We can receive 'num', and store new value to the same 'num'(!!!!????). We overwriting 'num' argument.
+
+
+
+        // that is the method of the number prototype (Strings and numbers can also have methods even if they are originaly PRIMITIVE data types). When we use methods on those primitives, then JS automaticaly converts them to OBJECTS.
+        num = num.toFixed(2); // 'toFix' puts 2 decimal nr on number 'num'. It returns String.
+
+        numSplit = num.split('.') // will divide 'num'. Braking point is '.'. Returns array.
+
+        int = numSplit[0];
+
+        dec = numSplit[1];
+
+        //with int.length will find out how many digits is in our number
+        if (int.length > 3) {
+            int = int.substr(0, (int.length - 3)) + ',' + int.substr((int.length - 3), 3); // substring method, takes index nr. where we want to start and second nr. designates how many characters we want. Returns the part of the string.
+        }
+
+        //use of 'ternary' operator
+        //type === 'exp' ? sign = '-' : sign = '+';
+        // explanation: "If the type is equal exp, then the sign should be '-'. If that is not the case, then the sign gonna be '+' "
+
+        //Modified version of ternary operator use:
+        //'(type === 'exp' ? '-' : '+')' will return either - or +.
+        // SINCE IT IS OPERATOR(???) WE WRAP IT IN PARENTACES AND IT
+        // IS GOING TO BE EXECUTED FIRST
+        return (type === 'exp' ? '-' : '+') + ' ' + int + '.' + dec;
+    };
+
+
+
+    // 'Node list' doesn't have forEach method. We would need again convert 'node list' into an array by using previous techniek, but this time we will create our own 'forEach' f-ion BUT for 'note lists'.
+    // 'list' - node list
+    // 'callback' - callback f-ion
+    ///////////////////////////////////////////
+    // IT MAY BE REUSED FOR ANY 'NODE LISTS'
+    ///////////////////////////////////////////
+    var nodeListForEach = function (list, callback) {
+        // each iteration will call callback f-ion
+        for (var i = 0; i < list.length; i++) {
+            callback(list[i], i); // using the power of FIRST CLASS F-IONS. F-ions can be passed like this...(??)
+        } // NOTE: 'node list' has 'length' property
+
+    };
+
 
 
     //f-ion to get an user input
@@ -351,7 +414,8 @@ var UIcontroller = (function () {
             // 'html' is a string AND string has bun#h of own methods, whi#h we #an use in here.  
             newHtml = html.replace('%id%', obj.id); //'replace' sear#hes for a given string and repla#es it with DATA THAT WE PUT INTO THE METHOD. 'id' - is obje#t property that holds ID.
             newHtml = newHtml.replace('%description%', obj.description);
-            newHtml = newHtml.replace('%value%', obj.value);
+            // newHtml = newHtml.replace('%value%', obj.value) - INSTED OF PASSING VALUE obj.value, we will pass THE RESULT OF FORMATING THIS NUMBER:
+            newHtml = newHtml.replace('%value%', formatNumber(obj.value, type));
 
             // ## Insert HTML into the DOM
 
@@ -421,10 +485,14 @@ var UIcontroller = (function () {
         },
 
         displayBudget: function (obj) {
+            var type;
+
+            obj.budget > 0 ? type = 'inc' : type = 'exp';
+
             // #anging text #ontent
-            document.querySelector(DOMstrings.budgetLabel).textContent = obj.budget; // it is equal to the budget, and that budget #omes from an obje#t that we pass to this method.
-            document.querySelector(DOMstrings.incomeLabel).textContent = obj.totalInc;
-            document.querySelector(DOMstrings.expenseLabel).textContent = obj.totalExp;
+            document.querySelector(DOMstrings.budgetLabel).textContent = formatNumber(obj.budget, type); // it is equal to the budget, and that budget #omes from an obje#t that we pass to this method.
+            document.querySelector(DOMstrings.incomeLabel).textContent = formatNumber(obj.totalInc, 'inc');
+            document.querySelector(DOMstrings.expenseLabel).textContent = formatNumber(obj.totalExp, 'exp');
 
 
             if (obj.percentage > 0) {
@@ -448,19 +516,7 @@ var UIcontroller = (function () {
 
 
 
-            // 'Node list' doesn't have forEach method. We will need again convert 'node list' into an array by using previous techniek, but this time we will create our own 'forEach' f-ion BUT for 'note lists'.
-            // 'list' - node list
-            // 'callback' - callback f-ion
-            ///////////////////////////////////////////
-            // IT MAY BE REUSED FOR ANY 'NODE LISTS'
-            ///////////////////////////////////////////
-            var nodeListForEach = function (list, callback) {
-                // each iteration will call callback f-ion
-                for (var i = 0; i < list.length; i++) {
-                    callback(list[i], i); // using the power of FIRST CLASS F-IONS. F-ions can be passed like this...(??)
-                } // NOTE: 'node list' has 'length' property
 
-            };
 
 
             //!!!!!!!!!!!!!!!!!
@@ -484,6 +540,56 @@ var UIcontroller = (function () {
         },
 
 
+        displayMonth: function () {
+            var now, year, month;
+
+            //will use Date Obj. constructor in order to save the curent date into a new variable.
+            now = new Date(); // will return the date of today.
+            // we can use methods to retrieve current year or month etc.
+
+            months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+            month = now.getMonth();
+
+            //'now' obje#t inherits some methods from Date prototype:
+            year = now.getFullYear();
+            document.querySelector(DOMstrings.dateLabel).textContent = months[month] + ' ' + year; // sele#ts the obje#t by #lass name and then assigns new text #ontent.
+            
+
+            //e.g.
+            // var christmas = new Date(2016, 11, 25); -> it will return the date object whith a christmas date...
+
+        },
+
+        // This method should perform style manipulations when we change posittion of '+-' switch/button:
+        changedType: function () {
+            // we have to sele#t all 3 elements which will re#eive 
+            // '.red-focus' class (this #lass is in css file). 
+            // THEN we need to select the button and give it '.red' #lass
+
+            // querySelectorAll() takes #lass names separated by #omas and combined in one string
+            var fields = document.querySelectorAll(
+                DOMstrings.inputType + ',' +
+                DOMstrings.inputDescription + ',' +
+                DOMstrings.inputValue
+
+            );
+
+            //!!! fields is a NODE LIST SO IN ORDER TO LOOP THROUGH IT WE CAN'T USE forEach() method. We have written a method for that: 'nodeListForEach'. Can use it in here.
+            
+                        // 'cur' - current element
+            nodeListForEach(fields, function(cur) {
+               
+                // we want to put der focuss #lass on #urrent elemnt.
+                cur.classList.toggle('red-focus'); // this red-fo#us #lass will get added BUT it will never get removed #oz we dont have remove method yet. Therefore we will use 'toggle'.
+                // 'toggle' will add red-fo#us #lass when it is not there and remove it when it is present. EA#H TIME THE TYPE #HANGES, WE WANT THIS #LASS TO #HANGE.
+                
+            });
+            
+            document.querySelector(DOMstrings.inputBtn).classList.toggle('red');
+            
+            
+        },
 
 
 
@@ -558,6 +664,11 @@ var controller = (function (budgetContr, UIcontr) {
         //////////////////////////////////////
         document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem); // adding event listenner to the parrent of our elements that will need to handle some events. 'ctrlDeleteItem' - f-ion, that is going to be called when someone clicks on 'container'.
 
+
+        //adding 'change' event:
+        // will write callback f-ion in UIcontroller coz it related to 
+        // UI manipulation.
+        document.querySelector(DOM.inputType).addEventListener('change', UIcontr.changedType);
 
 
 
@@ -697,6 +808,8 @@ var controller = (function (budgetContr, UIcontr) {
             console.log('Appli#ation has started.');
             // here need to #all settupEventListenners f-ion (that is the 
             // purpose of 'init' f.)
+
+            UIcontr.displayMonth();
 
             //to set everything to 0:
             UIcontr.displayBudget({
