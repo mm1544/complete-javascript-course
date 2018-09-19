@@ -1,15 +1,435 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Asynchronous JavaScript</title>
 </head>
+
 <body>
     <h1>Asynchronous JavaScript</h1>
     <script>
+        //        // That is a SYNCHRONOUS JS:
+        //        
+        //        //SYNCHRONOUS. maning - all the instru#tions are exe#uted one after the other, line by line, in the order that they appear in the #ode.
+        //        
+        //        const second = () => {
+        //            //!!!!!!!!!!!!!!!!!!!
+        //            //Asynchronous f-ion:
+        //            setTimeout(() => {
+        //                console.log('Async Heye!');
+        //            }, 2000) // it is a f-ion, whi#h we #an pass CALLBACK AND TIME. Timer specifies how lond we want the TIMER to run in miliseconds (2000ms == 2s). After this preset time will pass, then CALBACK f-ion will start to run (!!!!!!!)
+        //        }
+        //        // f-ion expression de#laration
+        //        // ARROW F-ION STYLE:
+        //        const first = () => {
+        //            console.log('Hey there');
+        //            second();
+        //            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //            console.log('The end.') //!!??
+        //        }
+        //        
+        //        first();
+        //        
+        //        //// End of SYNCHRONOUS JS
+
+
+        ///////////////////////////////////////////////////////////////
+        // HERE WE WILL SIMULATE AJAX CALLS TO GET SOME FAKE RECEPIES BY USING 'setTimout'.
+        // SO WE WILL SIMULATE LOADING THE DATA FROM REMOTE WEB SERVER, WHICH (OF COURSE) WILL BE ASYNCHRONOUS.
+        //////////////////////////////////////////////////////////////
+
+        //        function getRecipe() {
+        //            // will simulate that [1]we get a bunch of recipe IDs from server, AND THEN, [2]based on that we will select the recipe, and will get that recipe from the server.
+        //
+        //            //'setTimeout' here is just to simulate that our data 
+        //            // coming back from the server.
+        //            setTimeout(() => {
+        //                const recipeID = [523, 883, 432, 974];
+        //                console.log(recipeID);
+        //
+        //                // when data came back, we want to get a recipe
+        //                // for one of those IDs. Will use another 
+        //                // setTimeout to simulate that data comes back with recipe:
+        //                setTimeout(id => {
+        //                    const recipe = {
+        //                        title: 'Fresh tomato past',
+        //                        publisher: 'Jonas'
+        //                    };
+        //                    console.log(`${id}: ${recipe.title}`);
+        //
+        //
+        //                    //Now suppose we want to get another recipe from 
+        //                    // the same publisher
+        //                    setTimeout(publisher => {
+        //                        const recipe2 = {
+        //                            title: 'Italian pizza',
+        //                            publisher: 'Jonas'
+        //                        };
+        //                        console.log(recipe2);
+        //                    }, 1500, recipe.publisher) // 'publisher' is stored in recipe object
+        //
+        //                }, 1500, recipeID[2]); // 'recipeID[2]' will be passed as an argument 'id' to calback f. of setTimeout.
+        //
+        //                //WE CHAINED THOSE TWO TIMERS ONE AFTER ANOTHER
+        //
+        //
+        //
+        //
+        //            }, 1500);
+        //
+        //
+        //        }
+        //        getRecipe();
+
+
+        /*
+        Since we are dealing with time sensitive code, a PROMISE can have a diferent states. 
+            ##1Before the event has happend, the promise is "pending"
+            ##2After the event has happend, the promise is "settled" or "resolved". 
+            ##3 When the promise was successful, whi#h means that result is available, THEN the promise is "fulfilled", BUT if there was an error, THEN the promise is "rejected". 
+            
+        In more practical terms we can produce and consume promises. So when we ####produce a promise we ###create a new promise and ###send a result using that promise. 
         
+        THEN, when we consume it, we can use ###calback f-ions for ##fulfilment(??) and for ##rejection of our promise.
+        
+        Lets PRODUCE promises in order to recreate previous exemple, AND then CONSUME those promises.
+        
+        */
+
+
+        //PROMISE
+
+
+        /*
+       //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // Into it we pass a f-ion called "EXECUTOR", which is a f-ion that will be immediately called, once the promise is CREATED
+
+        //This first promise will be responsible for 'doing' the first part with the first timer (we get 4 ids from the server).
+        const getIDs = new Promise((resolve, reject) => {
+            // This EXECUTOR f-ion takes two arguments, which are TWO CALBACK F-IONS: ##RESOLVE and ##REJECT.
+            //That is because this EXECUTOR f-ion in here is used to inform the ##promise, whether the event it is handling was ##successful or ##not.
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //!!! AND if it was successful, we will call ##resolve f-ion, IF NOT - will call ##reject f.
+
+            //again using setTimeout in EXECUTOR f. to simulate a server:
+            setTimeout(() => { // with calback f. after 1,5s
+                resolve([523, 883, 432, 974]); // this f-ion takes an argument, which is for the result of the promise
+
+            }, 1500); // after when this timer finishes after 1,5s we SAY THAT THE PROMISE IS SUCCESSFUL AND WE WANT TO RETURN DATA 
+
+            //##NO ''REJECT''
+            //SINCE THE setTimeout is impossible to fail (timer will always finish), SO WE DON'T NEED TO CALL THE REJECT F-ION IN ##THIS CASE (we would need it in some other cases).
+
+        });
+
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // will create a f-ion which receives an ID and then Returns(??!!) a PROMISE(??!)
+
+        // Is the f-ion which receives a recipe ID (recID), which we then passing into setTimeout(), AND then it will 'become' ID. And inside the calback f-ion ('resolve()') we use ID.
+        const getRecipe = recID => {
+            return new Promise((resolve, reject) => {
+
+                //!!! always using 'resolve' and 'reject'
+
+                setTimeout(ID => {
+                    // calback f. of 'setTimeout'
+                    const recipe = {
+                        title: 'Fresh tomato past',
+                        publisher: 'Jonas'
+                    };
+                    resolve(`${ID}: ${recipe.title}`);
+
+                }, 1500, recID);
+            }); // returning a PROMISE. Inside of PROMISE is ###EXECUTOR f-ion.
+        };
+
+        //###################################################
+        // this one is used to fetch recipe which is related to 
+        // the author of the firs recipe.
+        // This needs to happen in the ###sequence because we can only load a related recipe if we already know the publisher
+        const getRelated = publisher => {
+            return new Promise((resolve, reject) => {
+
+                setTimeout(pub => {
+
+                    const recipe = {
+                        title: 'Italian pizza',
+                        publisher: 'Jonas'
+                    };
+                    resolve(`${pub}: ${recipe.title}`);
+
+
+                }, 1500, publisher); // 'publisher' is the thing that we get there as the input to 'getRelated' f. It will be passed to the calback f. of 'setTimeout' f. 
+            });
+        };
+
+
+
+
+//        //###################################################
+//        //###################################################
+//        //NOW WE NEED TO CONSUME THIS PROMISES. IN ORDER TO DO THAT, WE CAN USE 2 METHODS ###ON ALL OF THE PROMISE OBJETS###. THESE METHODS: ##THEN and ##CATCH. ALL OF PROMISE OBJECT ###INHERITS THESE 2 METHODS.
+//
+//        //HANDLES THE SUCCESSFUL PROMISE - 'then()' - it is available on all PROMISE objects:
+//        getIDs.then(IDs => {
+//                // INTO THIS 'then()' WE PASS ACALBACK F-ION, WHICH WILL ALWAYS HAVE AS AN ARGUMENT ####A RESULT OF A SUCCESSFUL PROMISE####
+//                // 'IDs' is the result of the successful PROMISE
+//                console.log(IDs);
+//
+//                // !!!!! CONSUMING 'getRecipe' PROMISE:
+//                return getRecipe(IDs[2]); //!!!!!!!!!!!! this will return a PROMISE
+//
+//
+//
+//
+//
+//            }) // this 'then' method alowes us to add an event hendler for the case that the promise is ###fulfiled (which means that there is a result). We have to pass a calback f-ion, which will handle what we do in case if ###promise was successful.
+//            .then(recipe => {
+//                console.log(recipe);
+//                return getRelated('Jonas'); // this will return a new PROMISE
+//
+//
+//            }) // adding this second 'then' to 'resolve' PROMISE returned by previous PROMISE.
+//
+//
+//            .then(recipe => { // reusing 'recipe' name
+//                console.log(recipe);
+//
+//            })
+//
+//
+//
+//            .catch(error => {
+//                console.log(error);
+//            }); // 'then' and 'catch' are ''chained''. In this case it is impossible that 'catch() will be called'
+//
+//
+//
+//        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//        // 'catch()' method allowes to add a handler for the case that the PROMISE GETS REJECTED (e.g. if some error happend)
+        
+        
+        
+        
+        
+        // ASYNC / AWAIT
+        // USED TO ####CONSUME PROMISES
+        
+        
+        // CREATING ####async f-ion:
+        // That is new, special kind-off f-ion, which means that 
+        // this f-ion is ASYNCHRONOUS f-ion. 
+        // It will keep running in the background. 
+        // This async function ####RETURNS a PROMISE
+        
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // inside of async f. we can have 1 or more ###AWAIT expressions
+        async function getReipiesAW() {
+            const IDs = await getIDs; // getIDs - is our first 
+            // ###promise. To ###consume it we use 'await'. 
+            // 'await' will ###stop the code from executing until the ###promise is fulfiled###. If the promise is resolved (it was successful), THEN the value of that 'await' expression is the resolved value of the ###promise, which is assigned to IDs var.
+            // In this case promise will resolve to value '[523, 883, 432, 974]'.
+            console.log(IDs);
+            
+            const recipe = await getRecipe(IDs[2]); // getRecipe
+            // - returns ##promise, SO we ''await'' that that 
+            // promise finishes. After it finishes, we can then 
+            // log the recipe to console
+            console.log(recipe);
+            
+            const related = await getRelated('Jonas Schmedtmann');
+            console.log(related);
+            
+            
+            // WE CAN RETURN SOMETHING FROM ASYNC F-ION:
+            return recipe;
+            
+        }
+        
+        // 'getReipiesAW' automaticaly returns a promise with the resolved value of recipe, SO we can use 'then' in which we will pass a callback f-ion...
+        getReipiesAW().then(result => console.log(`${result} is the best ever!`));
+        
+        
+        
+        
+        
+        
+        //const rec = getReipiesAW(); // we starting this f-ion, 
+        // AND it begins to run ASYNCHRONOUSLY in the background. 
+        // Then with expression 'await' we wait for this promise 
+        // to 'resolev', assigning value to IDs variable.....
+        // If the promise is ejected, then an error will be 
+        // thrown...
+        
+        
+        //console.log(rec); // it is !!!!!!!!not working!!!!
+        // be#ause when this line is printed to console, we do 
+        // not have yet 'rec' returned.
+        
+        
+        //NOTE:  async f. runs in the background
+        // 'await' expression can be used only inside async f.
+        
+        
+        */
+
+
+
+
+
+        /////////////////////////////////////////
+        /////////////////////////////////////////
+        // L126
+        ////////////////////////////////////////
+        //MAKING ***AJAX CALLS*** WITH Fetch and Promises
+        ////////////////////////////////////////
+
+        //Theory:
+        /*
+        Cross Origin Resource Sharing (CORS) is a security mechanism built into all modern browsers. This mechanism prevents attackers that plant scripts on various websites (eg. in ads displayed via Google Ads) to make an AJAX call to 'www.yourbank.com' and in case you were logged in making a transaction using *your* credentials.
+
+So CORS uses additional HTTP headers to tell a browser to let a web application running at one origin (domain) have permission to access selected resources from a server at a different origin. So it has 'cross origin' permission (using two different domains).
+
+*/
+
+
+
+
+        /*
+
+
+        //////////////////////////////////
+        //wrapping everything in the f-ion, so it is more reusable:
+            // passing 'woeid'
+        function getWeather(woeid) {
+
+            // passing the URL where API is lo##ated (ie. URL to witch we 
+            // are sending request)
+            fetch(`https://cors-anywhere.herokuapp.com/https://www.metaweather.com/api/location/${woeid}/`) // firing request
+
+                // fetch() API gets data and RETURNS Promise(??). THIS PROMISE 
+                // CAN EITHER RETURN THE '''DATA''' THAT WE WANT OR AN 
+                // '''ERROR''' IF IT COULDN'T FIND THAT DATA, THAT WE 
+                // REQUESTED.
+
+                //So we can use 'then' and 'catch' methods ON THIS PROMISE jus 
+                // as we seen before....
+
+                // Most of the time(!!!) we just ***consume Promises and do not produce them.... (???)
+
+                // '''Fetch''' automaticaly ***returns a Promise, without us having to write promise ourselves(!!!!!), SO WE JUST CONSUMING IT HERE. Lets use 'then' and 'catch' methods ON IT:
+
+                .then(result => {
+                    // calback f-ion has here one argument and that is 
+                    // ****RESOLVED value of the Promise.
+                    // It means, that the data that comes back from 'Fetch' 
+                    // ADEX request is called ***result in this calback f-ion.
+                    console.log(result);
+
+                    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    // Result of RESOLVED value is stored as 'ReadableStream', and 
+                    // we HAVE TO CONVERT IT FROM JASON TO JS.
+                    // To achieve that we will use a JASON method on this string. 
+                    // AND this method also returns a PROMISE. SO we have to 
+                    // handle the result of that and AGAIN we have to use 'then' 
+                    // method. SO we 'chain' it like we did before.
+
+                    return result.json(); // SO 'result.json()' will return a 
+                    // Promise. 'result.json()' - conversion TO JSON happens 
+                    // asynchronously in the background, AND it can take some 
+                    // time. AS soon as it is ready, it comes ba#k with DATA, 
+                    // SO we need to handle that. Therefore we need to add a 
+                    // new 'then' method.
+
+                })
+
+                .then(data => {
+                    // console.log(data); // it logs whole object
+
+                    // extracting today's wheather:
+                    const today = data.consolidated_weather[0];
+
+                    console.log(`Temperatures today in ${data.title} stais between ${today.min_temp} and ${today.max_temp}`);
+                })
+
+                .catch(error => {
+                    // Case, that there is an ***error
+                    console.log(error);
+                });
+
+
+        };
+        
+        getWeather(2487956);
+        
+        //for London:
+        getWeather(44418);
+        
+        
+        
+        */
+
+
+
+
+
+
+
+
+        ///////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////
+        // L127
+        //////////////////////////////////////////////////////////
+        // Making ***AJAX Calls*** with Fetch and Async/Await
+        //////////////////////////////////////////////////////////
+
+
+        //
+        // Consuming Promises in easier way
+
+        //passing Where On Earth ID
+        // IT IS ASYNCHRONOUS CODE. THIS F-ION IS RUNNING IN THE BACKGOUND, SO IT IS NOT BLOCKING THE ***MAIN THREAD, THAT IS RUNNING IN JS ENGINE.
+        async function getWeatherAW(woeid) {
+
+            // Will wrapp all code into 'try' statement. It will try to execute that code, but if there is an ERROR, then it will jump to 'catch' part
+            try {
+
+                // IN THE BACKGROUND CODE STOPS BECAUSE OF 'AWAIT' 
+                // EXPRESSION:
+                const result = await fetch(`https://cors-anywhere.herokuapp.com/https://www.metaweather.com/api/location/${woeid}/`) // firing request
+
+                const data = await result.json();
+                const today = data.consolidated_weather[1];
+                console.log(`Temperatures tomorrow in ${data.title} stais between ${today.min_temp} and ${today.max_temp}`);
+
+
+                // NOTE: with async await we DON'T use 'then' and 'catch', 
+                // but instead we use 'await'.
+
+
+                // EXPLANATION: 'fetch' will get data from the server. WHEN data is received. Once the promise is 'fulfiled', the result will be assigned to variable 'result'.
+                
+                //NOTE: 'async' f-ion always returns a promise, lets use it(???):
+                // return data; // THAT WHAT WE RETURN FROM AYNC F-ION, WILL BE THE ****RESOLVED VALUE OF THE PROMISE, THAT F-ION getWeatherAW() RETURNS.
+
+            } catch (error) {
+                console.log(error);
+
+            }
+
+
+        }
+
+
+        getWeatherAW(2487956);
+
+        //for London:
+        getWeatherAW(44418);
+
     </script>
 </body>
+
 </html>
