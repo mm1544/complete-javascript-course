@@ -1,0 +1,93 @@
+/*
+THEORY: IMPORT-EXPORT
+
+//1.
+// Import (from default export)
+
+import stingName from './models/Search'; // for import don't have to specify '.js'
+
+
+//2.
+////////////////////////////////
+//NAMED Import from ***named export:
+
+    //We have to specify what exactly we want to import from the module:
+//import {add, multiply, ID} from './views/searchView';
+
+//console.log(`Using imported f-ions! ${add(ID, 2)} and ${multiply(3, 5)}. ${stingName}`);
+
+
+//3.
+//////////////////////////////
+// Third way of using import-export
+
+// import ***everything:
+import * as someName  from './views/searchView';
+
+console.log(`****V3. Using imported f-ions! ${someName.add(someName.ID, 2)} and ${someName.multiply(3, 5)}. ${stingName}`);
+
+
+*/
+
+/*
+AJAX - Asynchronous JavaScript And Xml
+It alloves asynchronously comunicate with remote servers.
+
+Eg.
+Let say we have JS App running in Browser, which is called 'client', AND we want some data from our server. BUT WITHOUT HAVING TO RELODE THE ENTIRE PAGE. With AJAX we can do ***''get'' Http request to our server, which will then send a ***response CONTAINING THE DATA THAT WE HAVE REQUESTED. 
+AND ALL THIS HAPPENS ASYNCHRONOUSLY IN THE BACKGROUND.
+
+It not only works for ***getting data from the server, but ALSO to ***send DATA to the server, BY DOING ***''post'' request .
+
+In practice there are many ways in which we can use AJAX in JS.
+
+*/
+
+
+
+//URL
+// https://www.food2fork.com/api/search
+
+// API KEY
+// d22e05225d28796a2a55f7512b1c058c
+
+
+
+
+
+
+
+//////////////////////////////////////////////
+//////////////////////////////////////////////
+// Controller will be placed in here
+/////////////////////////////////////////////
+// Each model and each view will get its ***own file*** for each of the functionality.
+// ****FOR CONTROLLERS:- all of them will be located in the same file.
+
+//*************************************************
+//Q: What is the ***state*** for app in any given moment?
+//A: All of the 'things' (e.g.: current search query; current recipe; number of servings that currently are calculated; items that are currently in the shopping list, etc.) in one given moment is the STATE. SO ALL OF THIS DATA IS A STATE. AND WE WANT THAT TO BE IN ****ONE CENTRAL PLACE*** i.e. - one central variable, like an object in which we have all the data that defines app in the given moment. 
+
+
+
+
+
+
+//**************************************
+//If we want to export **multiple things from the same module, then we have to use ****'named export'.
+
+// exporting f-ion:
+export const add = (a, b) => a + b;
+export const multiply = (a, b) => a * b;
+export const ID = 23;
+*/
+
+
+
+
+
+//IT IS GOOD TO HAVE ***ONE CENTRAL VARIABLE*** WITH ALL THOSE ***DOM ELEMENTS***, THAT WE NEED IN OUR APP. FOR THAT WILL CREATE A NEW MODULE.
+
+
+
+
