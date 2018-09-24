@@ -50,7 +50,7 @@ In practice there are many ways in which we can use AJAX in JS.
 
 import Search from './models/Search';
 import * as searchView from './views/searchView';// importing all of the f-ions. '*' indicates 'all'; 'searchView' will be an object where all the impoerted vars from 'searchView' module will be stored
-import {elements} from './views/base';
+import {elements, renderLoader, clearLoader} from './views/base';
 
 /** Global state of the app
 * - Search object
@@ -76,6 +76,7 @@ const controlSearch = async () => {
                 // clearing previous results; showing loading spinner; ...
         searchView.clearInput();
         searchView.clearResults();
+        renderLoader(elements.searchRes); // renders the loader
 
         // clear results from the previous search:
 
@@ -88,6 +89,10 @@ const controlSearch = async () => {
         
         
         // 5) Render results on UI
+
+        //before rendering results, need to remove a 'loader':
+        clearLoader();
+
                 // We want this to happen after we will receive the results from API
         searchView.renderResults(state.search.result);   // The result is stored inside of 'state' element; as well we have imported f-ions from the 'searchView'
     }
