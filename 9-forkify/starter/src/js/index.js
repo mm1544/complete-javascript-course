@@ -49,7 +49,7 @@ In practice there are many ways in which we can use AJAX in JS.
 //////////////////////////////////////////////////
 
 import Search from './models/Search';
-import * as searchView from './views/searchView';// importing all of the f-ions. '*' indicates 'all'
+import * as searchView from './views/searchView';// importing all of the f-ions. '*' indicates 'all'; 'searchView' will be an object where all the impoerted vars from 'searchView' module will be stored
 import {elements} from './views/base';
 
 /** Global state of the app
@@ -64,27 +64,32 @@ const state = {}; //starting with the empty state
                       //**That is asynchronous f.
 const controlSearch = async () => {
     // 1) Get query from view
-    const query = searchView.getInput();
+    const query = searchView.getInput(); // coz we have imported 'searchView' module
     console.log(query);
     
     // ***Creating a new search object
     if(query) { // if there is a 'query
         // 2) New search object and add to state
-        state.search = new Search(query);
+        state.search = new Search(query); // this Search obj. contains 'query'
         
         // 3) Prepare UI for results
                 // clearing previous results; showing loading spinner; ...
+        searchView.clearInput();
+        searchView.clearResults();
+
+        // clear results from the previous search:
+
         
         // 4) Search for recipes 
         //**Since 'controlSearch' is ***async f-ion, we CAN USE 'AWAIT'. 'state.search.getResults();' WILL RETURN A 'PROMISE'. why? - ***EVERY ASYNC F-ION AUTOMATICALY RETURNS A PROMISE****
-        await state.search.getResults(); // we have to 'await' until the **promise **resolves and comes back with Data.
+        await state.search.getResults(); // we have to 'await' until the **promise **resolves and comes back with Data. Here we are GETTING results from API call
+
+
         
         
         // 5) Render results on UI
                 // We want this to happen after we will receive the results from API
-        console.log(state.search.result);
-        
-        
+        searchView.renderResults(state.search.result);   // The result is stored inside of 'state' element; as well we have imported f-ions from the 'searchView'
     }
 }
 

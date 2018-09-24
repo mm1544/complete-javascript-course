@@ -91,3 +91,8 @@ export const ID = 23;
 
 
 
+//about 'insertAdjacentHTML':
+// https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentHTML
+
+
+

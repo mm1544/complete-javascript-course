@@ -3,6 +3,10 @@
 //***named export
 export const elements = {
     searchForm: document.querySelector('.search'),
-    searchInput: document.querySelector('.search__field')
+    searchInput: document.querySelector('.search__field'),
+    searchResList: document.querySelector('.results__list')
 
 };
+
+//IT IS GOOD TO HAVE ***ONE CENTRAL VARIABLE*** WITH ALL THOSE ***DOM ELEMENTS***, THAT WE NEED IN OUR APP. FOR THAT WILL CREATE A NEW MODULE.
+

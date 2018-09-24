@@ -80,12 +80,12 @@ export default class Search {
         try {
 
             const res = await axios(`https://www.food2fork.com/api/search?key=${key}&q=${this.query}`); //THE RESOLVED VALUE OF THE PROMISE, WILL BE SAVED IN 'res' variable. 
-            console.log(res);
+            //console.log(res);
 
 
             // recipies will be saved in object
             this.result = res.data.recipes; // WHY 'this.result' is not in constructor??
-            console.log(this.result);
+            //console.log(this.result);
 
             //console.log(this.result);
         } catch (error) { // loging the error

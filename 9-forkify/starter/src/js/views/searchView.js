@@ -13,10 +13,103 @@ import {elements} from './base';
 
 // To read an input from an input form.
     // Need to return an input value of the field. SO will select DOM element, then will get the value, and will return it.
-export const getInput = () => elements.searchInput.value; // getting input value. ***FOR ARROW f.: since it is just one line, it is **IMPLICIT RETURN***, I.E. WE DON'T NEED ***'return'
+export const getInput = () => elements.searchInput.value; // getting input value. ***FOR ARROW f.: since it is just one line, it is **IMPLICIT RETURN***, I.E. WE DON'T NEED to write ***'return'
 
 
-//IT IS GOOD TO HAVE ***ONE CENTRAL VARIABLE*** WITH ALL THOSE ***DOM ELEMENTS***, THAT WE NEED IN OUR APP. FOR THAT WILL CREATE A NEW MODULE.
+
+export const clearInput = () => { elements.searchInput.value = '';
+} // we are NOT ***returning here anything, therefore need to wrap it into '{}' to **avoid implicit return**
+
+
+ // 
+export const clearResults = () => { 
+    elements.searchResList.innerHTML = ''; // Html inside of 'searchResList' will be emptied
+};
+
+
+
+// 'rendering' - lt. atvaizdavimas
+
+
+
+
+//Limits the length of the recipe title length
+// 'limit=17' - it is a ***default parameter***
+const limitRecipeTitle = (title, limit = 17) => {
+    const newTitle = []; //!!! we can mutate 'const' array
+
+    //need to test if the length of the title is longer than the limit, and only then need to shorten the title.
+    if (title.length > limit) {
+        //need to split title into its words and THEN use the 'reduce' method on the resulting array, which then allowes us to have an accumulator. That accumulator is like a variable that we can add to at each iteration of the loop.
+        // In each itteration loop we will test if the current title length PLUS the next word are STILL in the word LIMIT.
+
+
+        /*
+        E.g.:
+        'Pasta with tomato and spinach'
+        acc:0 / acc + cur.length = 5 / newTitle = ['Pasta']
+        acc:5 / 5 + 4 = 9 / newTitle = ['Pasta', 'with']
+        acc:9 / 9 + 6 = 15 / newTitle = ['Pasta', 'with', 'tomato']
+        acc:15 / 15 + 3 = 18 / newTitle = ['Pasta', 'with', 'tomato']
+        acc:18 / 18 + 7 = 25 / newTitle = ['Pasta', 'with', 'tomato']
+        */
+
+
+            //***'reduce' loops through the array, 'cur' is current word of array at given iteration
+        title.split(' ').reduce((acc, cur) => {
+            if(acc + cur.length <= limit) {
+                newTitle.push(cur);
+
+            }
+            //updating the accumulator by ***returning value, ***THAT HOW IT WORKS IN 'REDUCE' f-ion
+            return acc + cur.length;
+        }, 0); //**spliting by the 'space' and turning into an **array
+        // THEN we use 'reduce' and passing a ***callback f-ion, which has the ***accumulator and the **current value** as the INPUT.
+        // **second parameter of reduce() is INITIAL accumulator value =0
+
+        // Will start with accumulator equal to 0, and through iterations will add to it.
+
+        // return the result
+        return `${newTitle.join(' ')}...`;
+
+    } 
+    return title;
+};
+
+
+// will re#eive 1 re#ipe
+const renderRecipe = recipe => {
+
+    // This will ****generate a variable containing a markup****, that we want to print
+    const markup = `
+    <li>
+        <a class="results__link" href="#${recipe.recipe_id}">
+                        <figure class="results__fig">
+                            <img src="${recipe.image_url}" alt="${recipe.title}">
+                        </figure>
+                        <div class="results__data">
+                            <h4 class="results__name">${limitRecipeTitle(recipe.title)}</h4>
+                            <p class="results__author">${recipe.publisher}</p>
+                        </div>
+                    </a>
+                </li>
+                `;
+                // ***Need to render it TO DOM***; should put it back to html file, into class='results__list'. 
+                // ***Will add it to base.js file, to the elements object
+
+                // ***'insertAdjacentElement'
+    elements.searchResList.insertAdjacentHTML('beforeend', markup); // this will be exe#uted 30 times, i.e. on#e for ea#h re#ipe
+
+};
+
+
+// will receive all the recipes (array of 30 recipes)
+export const renderResults = recipes => {
+
+    // 'forEach' - to loop through array
+    recipes.forEach(renderRecipe); // NOTE: It will ***automatically pass items from array to 'renderRecipe' f-ion***
+
+}
 
 
 
