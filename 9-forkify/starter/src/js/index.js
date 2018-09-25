@@ -86,6 +86,7 @@ const controlSearch = async () => {
         await state.search.getResults(); // we have to 'await' until the **promise **resolves and comes back with Data. Here we are GETTING results from API call
 
 
+
         
         
         // 5) Render results on UI
@@ -106,7 +107,31 @@ elements.searchForm.addEventListener('submit', e => {
     controlSearch();
 } );
 
+// 'e' - is the event, a 'click' in this case
+elements.searchResPages.addEventListener('click', e => {
+    //will use the 'target' property (?) 
+    //target referes to the place where exactly this event has happend.
 
+    // 'closesr' is receiving **selector. Selector that we want is the ***class of the button*** that we are looking for (button with 'btn-inline' class !!!!!)
+
+    /*
+    e.g.:
+    <button class="btn-inline results__btn--${type}" data-goto=${type === 'prev' ? page - 1 : page + 1}>
+        <svg class="search__icon">
+            <use href="img/icons.svg#icon-triangle-${type === 'prev' ? 'left' : 'right'}"></use>
+        </svg>
+        <span>${type === 'prev' ? page - 1 : page + 1}</span>
+    </button>
+*/
+//We are interested in the button with 'btn-inline' class... Sometimes we can accidently click on '<svg class="search__icon">' element, or on '<span>${type ==...' element, but we are only interested in on clicking  the button with 'btn-inline' class, SO WE USE 'CLOSEST' METHOD AND STATE THAT WE ARE ONLY INTERESTED IN ONES WITH CLASS 'btn-inline'... SO it will find the closest element with the 'btn-inline' class
+
+    const btn = e.target.closest('.btn-inline');
+    if (btn) {
+        const goToPage = parseInt(btn.dataset.goto, 10); // will read the data that is stored in that 'data atribute'
+        searchView.clearResults();
+        searchView.renderResults(state.search.result, goToPage);
+    } 
+})
 
 
 
@@ -122,8 +147,13 @@ elements.searchForm.addEventListener('submit', e => {
 //A: All of the 'things' (e.g.: current search query; current recipe; number of servings that currently are calculated; items that are currently in the shopping list, etc.) in one given moment is the STATE. SO ALL OF THIS DATA IS A STATE. AND WE WANT THAT TO BE IN ****ONE CENTRAL PLACE*** i.e. - one central variable, like an object in which we have all the data that defines app in the given moment. 
 
 
+// Problem: 
+//          Where to attach event listeners to if the padination buttons are NOT YET created when the page is loaded (why can't we wait, and render buttons together with corresponding listeners??).
+// We have to use ***EVENT DELEGATION***. Concept: - We attach the event listener to an element that is already in there, and then we try to figure out, where the click happend, so that we could take an action based on that.
+// THE ELEMENT that is available at the load is 'class="results__pages"'. That is where we will put an event handler.!!!!
 
-
+//How do we define where the click will happen? I.e. How to say that I want something to happen when I'm clicking on the 'button', when in reality I am clicking on the text or icon, AND NOT THE BUTTON ELEMENT ITSELF(whichone I'm looking for).
+// For that we can use the 'closest' method
 
 
 

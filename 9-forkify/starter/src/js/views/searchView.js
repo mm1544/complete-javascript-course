@@ -24,6 +24,7 @@ export const clearInput = () => { elements.searchInput.value = '';
  // 
 export const clearResults = () => { 
     elements.searchResList.innerHTML = ''; // Html inside of 'searchResList' will be emptied
+    elements.searchResPages.innerHTML = '';
 };
 
 
@@ -102,13 +103,65 @@ const renderRecipe = recipe => {
 
 };
 
+// F-ion that ***renders a button
+// 'type': 'prev' ot 'next'
+// 'page': nr of the page that we are currently in
+const createButton = (page, type) => `
+<!-- in html5 there is ***'Data Atributes'... So we can use 'data' and the can specify a random name, AND THEN can use the number that we want to use on that button. We will use this peoperty when we will attach event handler to these buttons
+-->
 
-// will receive all the recipes (array of 30 recipes)
-export const renderResults = recipes => {
+<button class="btn-inline results__btn--${type}" data-goto=${type === 'prev' ? page - 1 : page + 1}>
+    <span>${type === 'prev' ? page - 1 : page + 1}</span>
+    <svg class="search__icon">
+        <use href="img/icons.svg#icon-triangle-${type === 'prev' ? 'left' : 'right'}"></use>
+    </svg>
+</button>
+`; // returns markup text string, that needs to be inserted in main html code (?)
 
+
+//Rendering 'page' action buttons according to the 
+// number of the page, that we are on
+//          (it is private f-ion)
+const renderButtons = (page, numResults, resPerPage) => {
+    const pages = Math.ceil(numResults / resPerPage);
+
+    let button; // 'const' and 'let' in ES6 they are ***block scoped***, therefore 'button' neeeds to be declared outside of if(){} block. If declared inside, it is not going to be available OUTSIDE of it. Nor using 'const' coz will reassign it.
+    if (page === 1 && pages > 1){
+        // Need to render the button just to go to the NEXT page, when on the First page, AND there is are more than one page
+        button = createButton(page, 'next'); // needs to be assigned to the variable
+
+    } else if (page < pages) {
+        //if in the middle pages, need to render both:- NEXT and BACK buttons.
+        button =`${createButton(page, 'prev')}
+        ${createButton(page, 'next')};
+        `; // Strings contains the result of calling f-ion 'createButton' twice
+    }
+    
+    else if (page === pages && pages > 1) { // if it is the LAST page, render just button to go to the PREVIOUS page
+        button = createButton(page, 'prev');
+    };
+
+    //Inserting button into DOM
+    elements.searchResPages.insertAdjacentHTML('afterbegin', button);
+};
+
+
+
+// That is the f-ion, that will be called whenever we click on on eof the buttons
+// will receive all the recipes (array of 30 recipes), and will need to pass in to it the page, that we want to display. And will pass results per page.
+export const renderResults = (recipes, page = 1, resPerPage = 10) => {
+    // RENDER RESULTS OF CURRENT PAGE
+    const start = (page - 1) * resPerPage;
+    const end = page * resPerPage;
+
+    // 'recipes' - is the array of 30 recipes
     // 'forEach' - to loop through array
-    recipes.forEach(renderRecipe); // NOTE: It will ***automatically pass items from array to 'renderRecipe' f-ion***
 
+    // will use 'slice' method to take just a part of an array. First argument of it is the start point of copying the array, 
+    recipes.slice(start, end).forEach(renderRecipe); // NOTE: It will ***automatically pass items from array to 'renderRecipe' f-ion***
+
+    // RENDER PAGINATION BUTTONS
+renderButtons(page, recipes.length, resPerPage);
 }
 
 
