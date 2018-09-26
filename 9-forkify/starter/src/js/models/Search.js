@@ -1,6 +1,34 @@
 import axios from 'axios';
+import {key, proxy} from '../config'; //[8]
+//[1]
+export default class Search {
+    //[2]
+    constructor(query) { //[3]
+        this.query = query;
+    }
+
+    // This is **acynchronous method of this class
+    async getResults() { //[4]
+
+        try {
+            const res = await axios(`${proxy}https://www.food2fork.com/api/search?key=${key}&q=${this.query}`); //[5]
+
+            // recipies will be saved in object
+            this.result = res.data.recipes; //[6] 
+        } catch (error) { // loging the error
+            alert(error);
+        }
+    }
+}
+//[7] 
+
+
+
 
 /*
+[1]
+
+
 THEORY
 
 // It is a convention to write model file name 
@@ -23,11 +51,6 @@ THEORY
 // eg.
 
 export default 'I am an exported string'; // so it will be exported from this file
-*/
-
-
-
-
 
 
 
@@ -37,19 +60,18 @@ export default 'I am an exported string'; // so it will be exported from this fi
 // The only thing that we will export from this model here will
 // be *****this class***.
 //!!!!!!!!!!!!!!!!!!!!!!!
-export default class Search {
+
+[2]
     // RECAP: For class always need to add constructor method, 
     // which is the method that is called as soon as we create a 
     // new object
 
-    constructor(query) { //will need to specify 'query' parameter whenever new object of 'Search' class is created.
-        this.query = query;
 
-        //Will use a method in here, that we will use to **get results** for the ***search query***.
-    }
+[3]
+//will need to specify 'query' parameter whenever new object of 'Search' class is created.
 
-    // This is acynchronous method of this class
-    async getResults() {
+
+[4]
 
         // Going to make http requests for AJAX call
         // 'fetch' doesn't work on all browsers
@@ -75,27 +97,23 @@ export default class Search {
 
         //////////////////////////////////////////////////
         // It will do a **AJAX call** and will return a ***promise
-        const key = 'd22e05225d28796a2a55f7512b1c058c';
+        
 
-        try {
 
-            const res = await axios(`https://www.food2fork.com/api/search?key=${key}&q=${this.query}`); //THE RESOLVED VALUE OF THE PROMISE, WILL BE SAVED IN 'res' variable. 
+[5]
+//THE RESOLVED VALUE OF THE PROMISE, WILL BE SAVED IN 'res' variable. 
             //console.log(res);
 
+[6]
+WHY 'this.result' is not in constructor??
 
-            // recipies will be saved in object
-            this.result = res.data.recipes; // WHY 'this.result' is not in constructor??
-            //console.log(this.result);
+[7]
+Will have **query and corresponding **result both stored inside of ***Search object. That has some advantages(??)
 
-            //console.log(this.result);
-        } catch (error) { // loging the error
-            alert(error);
-        }
-    }
-}
 
-// Will have **query and corresponding **result both stored inside of ***Search object. That has some advantages(??)
-
+[8]
+'..' - meaning: one folder above
+*/
 
 
 

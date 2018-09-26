@@ -1,5 +1,88 @@
+//[1]
+import Search from './models/Search';
+import Recipe from './models/Recipe';
+import * as searchView from './views/searchView';//[3] 
+import { elements, renderLoader, clearLoader } from './views/base';
+
+//[2]
+/** Global state of the app
+* - Search object
+* - Current recipe object
+* - Shopping list obj.
+* - Liked recipes
+**/
+const state = {}; //starting with the empty state
+
 
 /*
+*SEARCH CONTROLLER
+*/
+const controlSearch = async () => {//**That is asynchronous f.
+    // 1) Get query from view
+    const query = searchView.getInput(); //[4] 
+    console.log(query);
+
+    // ***Creating a new search object
+    if (query) { //[5] 
+
+        // 2) New search object and add to state
+        state.search = new Search(query); //[6] 
+
+        // 3) Prepare UI for results
+        //[7] 
+        searchView.clearInput();
+        searchView.clearResults();
+        renderLoader(elements.searchRes); //renders the loader
+
+        // 4) Search for recipes 
+        //[8]
+        await state.search.getResults(); //[9]
+
+        // 5) Render results on UI
+
+        //before rendering results, need to remove a 'loader':
+        clearLoader();
+
+        //[11]
+        searchView.renderResults(state.search.result); //[10] 
+    }
+}
+
+elements.searchForm.addEventListener('submit', e => {
+    //[12] 
+
+    e.preventDefault(); // stops default behaviour
+    controlSearch();
+});
+
+// 'e' - is the event, i.e. a 'click' in this case
+elements.searchResPages.addEventListener('click', e => {
+    //[13]
+    const btn = e.target.closest('.btn-inline');
+    if (btn) {
+        const goToPage = parseInt(btn.dataset.goto, 10);//[14]
+
+        searchView.clearResults(); //[15]
+        searchView.renderResults(state.search.result, goToPage);
+    }
+})
+//[16]
+
+
+/*
+*RECIPE CONTROLLER
+*/
+const r = new Recipe(46956);
+
+//calling 'getRecipe' method on 'r' object
+r.getRecipe();
+console.log(r);
+
+
+
+
+/*
+[1]
 THEORY: IMPORT-EXPORT
 
 //1.
@@ -28,9 +111,6 @@ import * as someName  from './views/searchView';
 console.log(`****V3. Using imported f-ions! ${someName.add(someName.ID, 2)} and ${someName.multiply(3, 5)}. ${stingName}`);
 
 
-*/
-
-/*
 AJAX - Asynchronous JavaScript And Xml
 It alloves asynchronously comunicate with remote servers.
 
@@ -42,79 +122,54 @@ It not only works for ***getting data from the server, but ALSO to ***send DATA 
 
 In practice there are many ways in which we can use AJAX in JS.
 
-*/
 
-//////////////////////////////////////////////////
-//////////////////////////////////////////////////
-//////////////////////////////////////////////////
 
-import Search from './models/Search';
-import * as searchView from './views/searchView';// importing all of the f-ions. '*' indicates 'all'; 'searchView' will be an object where all the impoerted vars from 'searchView' module will be stored
-import {elements, renderLoader, clearLoader} from './views/base';
-
-/** Global state of the app
+[2]
+*** Global state of the app
 * - Search object
 * - Current recipe object
 * - Shopping list obj.
 * - Liked recipes
-*/
-const state = {}; //starting with the empty state
-            // Listener for 'submit' event
+***
 
-                      //**That is asynchronous f.
-const controlSearch = async () => {
-    // 1) Get query from view
-    const query = searchView.getInput(); // coz we have imported 'searchView' module
-    console.log(query);
-    
-    // ***Creating a new search object
-    if(query) { // if there is a 'query
-        // 2) New search object and add to state
-        state.search = new Search(query); // this Search obj. contains 'query'
-        
-        // 3) Prepare UI for results
-                // clearing previous results; showing loading spinner; ...
-        searchView.clearInput();
-        searchView.clearResults();
-        renderLoader(elements.searchRes); // renders the loader
-
-        // clear results from the previous search:
-
-        
-        // 4) Search for recipes 
-        //**Since 'controlSearch' is ***async f-ion, we CAN USE 'AWAIT'. 'state.search.getResults();' WILL RETURN A 'PROMISE'. why? - ***EVERY ASYNC F-ION AUTOMATICALY RETURNS A PROMISE****
-        await state.search.getResults(); // we have to 'await' until the **promise **resolves and comes back with Data. Here we are GETTING results from API call
+[3]
+importing all of the f-ions. '*' indicates 'all'; 'searchView' will be an object where all the impoerted vars from 'searchView' module will be stored
 
 
+[4]
+coz we have imported 'searchView' module
 
-        
-        
-        // 5) Render results on UI
+[5]
+if there is a 'query'
 
-        //before rendering results, need to remove a 'loader':
-        clearLoader();
+[6]
+this Search obj. contains 'query'
 
-                // We want this to happen after we will receive the results from API
-        searchView.renderResults(state.search.result);   // The result is stored inside of 'state' element; as well we have imported f-ions from the 'searchView'
-    }
-}
+[7]
+clearing previous results; showing loading spinner; ...
 
-elements.searchForm.addEventListener('submit', e => {
-    //That is 'calback f-ion'
-    // passing ***'event' object 'e'*** into it
-    
-    e.preventDefault(); // stops default behaviour
-    controlSearch();
-} );
+[8]
+**Since 'controlSearch' is ***async f-ion, we CAN USE 'AWAIT'. 'state.search.getResults();' WILL RETURN A 'PROMISE'. why? - ***EVERY ASYNC F-ION AUTOMATICALY RETURNS A PROMISE****
 
-// 'e' - is the event, a 'click' in this case
-elements.searchResPages.addEventListener('click', e => {
-    //will use the 'target' property (?) 
+[9]
+ we have to 'await' until the **promise **resolves and comes back with Data. Here we are GETTING results from API call
+
+[10]
+The result is stored inside of 'state' element; as well we have imported f-ions from the 'searchView'
+
+[11]
+ We want this to happen after we will receive the results from API
+
+[12]
+That is 'calback f-ion'. Passing ***'event' object 'e'*** into it
+
+[13]
+//will use the 'target' property (?) 
     //target referes to the place where exactly this event has happend.
 
-    // 'closesr' is receiving **selector. Selector that we want is the ***class of the button*** that we are looking for (button with 'btn-inline' class !!!!!)
+    // 'closest' is receiving **selector. Selector that we want is the ***class of the button*** that we are looking for (button with 'btn-inline' class !!!!!)
 
-    /*
+    
     e.g.:
     <button class="btn-inline results__btn--${type}" data-goto=${type === 'prev' ? page - 1 : page + 1}>
         <svg class="search__icon">
@@ -122,19 +177,17 @@ elements.searchResPages.addEventListener('click', e => {
         </svg>
         <span>${type === 'prev' ? page - 1 : page + 1}</span>
     </button>
-*/
-//We are interested in the button with 'btn-inline' class... Sometimes we can accidently click on '<svg class="search__icon">' element, or on '<span>${type ==...' element, but we are only interested in on clicking  the button with 'btn-inline' class, SO WE USE 'CLOSEST' METHOD AND STATE THAT WE ARE ONLY INTERESTED IN ONES WITH CLASS 'btn-inline'... SO it will find the closest element with the 'btn-inline' class
 
-    const btn = e.target.closest('.btn-inline');
-    if (btn) {
-        const goToPage = parseInt(btn.dataset.goto, 10); // will read the data that is stored in that 'data atribute'
-        searchView.clearResults();
-        searchView.renderResults(state.search.result, goToPage);
-    } 
-})
+    //We are interested in the button with 'btn-inline' class... Sometimes we can accidently click on '<svg class="search__icon">' element, or on '<span>${type ==...' element, but we are only interested in on clicking  the button with 'btn-inline' class, SO WE USE 'CLOSEST' METHOD AND STATE THAT WE ARE ONLY INTERESTED IN ONES WITH CLASS 'btn-inline'... SO it will find the closest element with the 'btn-inline' class
 
 
+[14]
+will read the data that is stored in that 'data atribute'
 
+[15]
+clears the list befor rendering new one
+
+[16]
 //////////////////////////////////////////////
 //////////////////////////////////////////////
 // Controller will be placed in here
@@ -155,6 +208,9 @@ elements.searchResPages.addEventListener('click', e => {
 //How do we define where the click will happen? I.e. How to say that I want something to happen when I'm clicking on the 'button', when in reality I am clicking on the text or icon, AND NOT THE BUTTON ELEMENT ITSELF(whichone I'm looking for).
 // For that we can use the 'closest' method
 
+
+
+*/
 
 
 
