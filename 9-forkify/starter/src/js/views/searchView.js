@@ -27,6 +27,20 @@ export const clearResults = () => {
     elements.searchResPages.innerHTML = '';
 };
 
+export const highlightSelected = id => {
+    const resultsArr = Array.from(document.querySelectorAll('.results__link')); // sele#ting all with su#h #lass (??) , and put all such elements into an array
+
+    resultsArr.forEach(el => {
+        // for ea#h of them will remove the #lass
+        el.classList.remove('results__link--active');
+    });
+
+
+    document.querySelector(`a[href="#${id}"]`).classList.add('results__link--active');// using CSS selectors; we can sele#t all **links based on atributes (?); here we will have a link with '#' symbol and 'id'
+    // WE WANT TO SELECT AN ATRIBUTE WHICH HAS SOME PARTICULAR ID
+
+}
+
 
 
 // 'rendering' - lt. atvaizdavimas
