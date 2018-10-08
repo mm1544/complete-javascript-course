@@ -36,7 +36,7 @@ export const highlightSelected = id => {
     });
 
 
-    document.querySelector(`a[href="#${id}"]`).classList.add('results__link--active');// using CSS selectors; we can sele#t all **links based on atributes (?); here we will have a link with '#' symbol and 'id'
+    document.querySelector(`.results__link[href="#${id}"]`).classList.add('results__link--active');// using CSS selectors; we can sele#t all **links based on atributes (?); here we will have a link with '#' symbol and 'id'
     // WE WANT TO SELECT AN ATRIBUTE WHICH HAS SOME PARTICULAR ID
 
 }
@@ -50,7 +50,7 @@ export const highlightSelected = id => {
 
 //Limits the length of the recipe title length
 // 'limit=17' - it is a ***default parameter***
-const limitRecipeTitle = (title, limit = 17) => {
+export const limitRecipeTitle = (title, limit = 17) => {
     const newTitle = []; //!!! we can mutate 'const' array
 
     //need to test if the length of the title is longer than the limit, and only then need to shorten the title.

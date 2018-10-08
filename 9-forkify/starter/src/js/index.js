@@ -2,10 +2,13 @@
 import Search from './models/Search';
 import Recipe from './models/Recipe';
 import List from './models/List';
+import Likes from './models/Likes';
 import * as searchView from './views/searchView';//[3] 
 import * as recipeView from './views/recipeView';//[3] 
 import * as listView from './views/listView';//[3] 
+import * as likesView from './views/likesView';//[3] 
 import { elements, renderLoader, clearLoader } from './views/base';
+//import Likes from './models/Likes';
 
 //[2]
 /** Global state of the app
@@ -144,9 +147,12 @@ const controlRecipe = async () => {
             // Render recipe to UI
             // clearing the loader
             clearLoader();
-            recipeView.renderRecipe(state.recipe); // passing the recipe
+            recipeView.renderRecipe(
+                state.recipe,
+                state.likes.isLiked(id)); // passing the recipe and current 'like' state (T/F)
 
         } catch (err) {
+            console.log(err);
             alert('Error processing recipe!');
         }
     }
@@ -216,6 +222,76 @@ elements.shopping.addEventListener('click', e => {
 
 
 
+/*
+*LIKE CONTROLLER
+*/
+
+// FOR TESTING
+state.likes = new Likes();
+likesView.toggleLikeMenu(state.likes.getNumLikes());
+
+const controlLike = () => {
+
+    // if there is no such 'state.likes', then it will be created:
+    if (!state.likes) state.likes = new Likes();
+
+    //TWO DIFFERENT STATES THAT CAN HAPPEN
+
+    //1) Recipe that is already liked; when button is hit, then this recipe has to be removed from the list of liked recipes
+
+    //2) Recipe is not yet liked
+
+
+    const currentID = state.recipe.id;
+
+
+    if (!state.likes.isLiked(currentID)) {
+        // recipe is NOT liked yet
+
+
+        // Add like to the state
+        const newLike = state.likes.addLike(
+            currentID,
+            state.recipe.title,
+            state.recipe.author,
+            state.recipe.img
+        ); // 'addLike' returns the newly added like which is saved in 'newLike'
+
+        // Toggle the like button
+        likesView.toggleLikeBtn(true);
+
+
+        // Add like to the UI list
+        likesView.renderLike(newLike);
+        
+    } else {
+
+        // it is liked 
+
+
+        // Remove like from the state
+        state.likes.deleteLike(currentID);
+
+        // Toggle the like button
+        likesView.toggleLikeBtn(false);
+
+
+        // Remove like to the UI list
+        likesView.deleteLike(currentID);
+        
+    }
+
+    likesView.toggleLikeMenu(state.likes.getNumLikes());
+
+};
+
+
+//Q: Where the NEW like is triggered?
+//A: On the 'like' button, which ***is in the recipe**, SO we will control that click with the same event listenner.
+
+
+
+
 
 //*********************************
 // **HANDLING RECIPE BUTTON CLICKS
@@ -251,7 +327,14 @@ elements.recipe.addEventListener('click', e => {
 
 
         //when the target matches '.recipe__btn--add' button, we will call 'controlList' f-ion.
+
+        //Add ingredients to shopping list
         controlList();
+
+    } else if (e.target.matches('.recipe__love, .recipe__love *')) {
+
+        //Like controller
+        controlLike();
 
     }
 });
