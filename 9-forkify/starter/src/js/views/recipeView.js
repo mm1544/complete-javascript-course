@@ -11,16 +11,18 @@ const formatCount = count => {
         //e.g. count = 2.5 --> 2 1/2
         //e.g. count = 0.5 --> 1/2
 
+        const newCount = Math.round(count * 10000) / 10000; // 'Math.round()' only returns integers, so we would lose the decimal part. To avoid it we do 'count * 10000', and then /10000
+
         //using destructuring, i.e. we can **define two wariables at the same time
-        const [int, dec] = count.toString().split('.').map(el => parseInt(el, 10)); // so we will get an array of strings e.g. [2, 5]. We need anew array with them as NUMBERS, therefore using 'map()'
-        if (!dec) return count; // if there is NO decimal part
+        const [int, dec] = newCount.toString().split('.').map(el => parseInt(el, 10)); // so we will get an array of strings e.g. [2, 5]. We need anew array with them as NUMBERS, therefore using 'map()'
+        if (!dec) return newCount; // if there is NO decimal part
 
         if (int === 0) { //e.g. count = 0.5 --> 1/2
-            const fr = new Fraction(count); // based on 'count' it will create a fraction, AND from there we can read enumerator and denuminator
+            const fr = new Fraction(newCount); // based on 'count' it will create a fraction, AND from there we can read enumerator and denuminator
             return `${fr.numerator}/${fr.denominator}`;
 
         } else { //e.g. count = 2.5 --> 2 1/2
-            const fr = new Fraction(count - int);
+            const fr = new Fraction(newCount - int);
             return `${int} ${fr.numerator}/${fr.denominator}`;
 
         }

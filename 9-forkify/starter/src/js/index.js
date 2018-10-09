@@ -19,8 +19,10 @@ import { elements, renderLoader, clearLoader } from './views/base';
 **/
 const state = {}; //starting with the empty state
 
+/*
 // makes the state available in th e'global window' obj. for testing
 window.state = state;
+*/
 
 /*
 *SEARCH CONTROLLER
@@ -108,7 +110,6 @@ const controlRecipe = async () => {
 
     //Get ID from URL
     const id = window.location.hash.replace('#', ''); //[18]
-    console.log(id);
 
 
     if (id) { //[19]
@@ -226,10 +227,6 @@ elements.shopping.addEventListener('click', e => {
 *LIKE CONTROLLER
 */
 
-// FOR TESTING
-state.likes = new Likes();
-likesView.toggleLikeMenu(state.likes.getNumLikes());
-
 const controlLike = () => {
 
     // if there is no such 'state.likes', then it will be created:
@@ -263,7 +260,7 @@ const controlLike = () => {
 
         // Add like to the UI list
         likesView.renderLike(newLike);
-        
+
     } else {
 
         // it is liked 
@@ -278,12 +275,29 @@ const controlLike = () => {
 
         // Remove like to the UI list
         likesView.deleteLike(currentID);
-        
+
     }
 
     likesView.toggleLikeMenu(state.likes.getNumLikes());
 
 };
+
+// Restore liked recipies on the page load (from localStorage)
+window.addEventListener('load', () => {
+    // Each time the page loads, we want to **create new Likes obj.
+
+    state.likes = new Likes();
+
+    // Restore likes
+    state.likes.readStorage();
+
+    // Toggle like menu button
+    likesView.toggleLikeMenu(state.likes.getNumLikes());
+
+    // Render the existing likes
+    state.likes.likes.forEach(like => likesView.renderLike(like));
+
+});
 
 
 //Q: Where the NEW like is triggered?
@@ -339,12 +353,12 @@ elements.recipe.addEventListener('click', e => {
     }
 });
 
-
+/*
 // Creating a new List element to test List in the console
 //and
 //attaching to the global 'window' obj.:
 window.l = new List();
-
+*/
 
 
 
